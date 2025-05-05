@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis Chatbot</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("{{ url_for('static', filename='images.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            text-align: center;
+        }
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 10px;
+            text-align: center;
+            background-color: white;
+        }
+        table {
+            width: 50%;
+            margin: auto;
+        }
+        h1 {
+            color: #fff;
+            text-shadow: 2px 2px 5px black;
+        }
+        textarea {
+            width: 50%;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        input[type="submit"], button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input[type="submit"]:hover, button:hover {
+            background-color: #45a049;
+        }
+        #chart-container {
+            width: 50%;
+            margin: auto;
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        #accuracyImage {
+            display: none;
+            width: 60%;
+            max-width: 600px;
+            margin: 20px auto;
+            border: 2px solid #333;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sentiment Analyzer Chatbot</h1>
+    
+    <form method="POST">
+        <textarea name="text1" placeholder="Say Something: ...." rows="5"></textarea><br><br>
+        <input type="submit" value="Analyze Sentiment">
+    </form>
+
+    {% if final %}
+    <div>
+        <h2>Sentiment Analysis Result</h2>
+        <table>
+            <tr>
+                <th>SENTIMENT METRIC</th>
+                <th>SCORE (%)</th>
+            </tr>
+            <tr>
+                <td>Positive</td>
+                <td>{{ text2 }}</td>
+            </tr>
+            <tr>
+                <td>Neutral</td>
+                <td>{{ text3 }}</td>
+            </tr>
+            <tr>
+                <td>Negative</td>
+                <td>{{ text5 }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="chart-container">
+        <canvas id="sentimentChart"></canvas>
+    </div>
+
+    <!-- Button to Show Accuracy Graph -->
+    <button onclick="toggleAccuracyImage()">Show Accuracy Graph</button>
+    <img id="accuracyImage" src="{{ url_for('static', filename='img.png') }}" alt="Model Accuracy Graph">
+
+    <script>
+        // Function to toggle accuracy image visibility
+        function toggleAccuracyImage() {
+            var img = document.getElementById('accuracyImage');
+            img.style.display = (img.style.display === 'none' || img.style.display === '') ? 'block' : 'none';
+        }
+
+        // Render Pie Chart for Sentiment Analysis
+        var ctx = document.getElementById('sentimentChart').getContext('2d');
+        var sentimentChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Positive', 'Neutral', 'Negative'],
+                datasets: [{
+                    data: [{{ text2 }}, {{ text3 }}, {{ text5 }}],
+                    backgroundColor: ['#4CAF50', '#3498db', '#e74c3c'],
+                    borderColor: ['#2e7d32', '#1e3a8a', '#c0392b'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+
+    {% else %}
+    <p>Here, we use the CNN algorithm for training and classification. The model achieves 98% accuracy, ensuring high performance and reliability.</p>
+    {% endif %}
+</body>
+</html>
